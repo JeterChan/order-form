@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 const { google } = require('googleapis');
 const { customAlphabet } = require('nanoid');
-const nodemailer = require('nodemailer');
+const { sendOrderEmail } = require('../utils/mailer');
 require('dotenv').config();
 
 // 建立 Google Sheets API 認證物件
@@ -34,9 +34,10 @@ router.post('/submit-order', async (req, res) => {
         const client = await auth.getClient();
         // 2. 初始化 google sheets api 客戶端
         const sheets = google.sheets({ version: 'v4', auth: client });
-        console.log(order);
+
         // 3. 將商品資料變成 2D array, 每個子陣列對應一個 row
         //    將每筆商品填入完整的訂單資訊和當下時間
+        const orderDate = new Date().toLocaleDateString('zh-TW', {hour12:false});
         const rows = (order.items || []).map(item => ([
             orderId || '',
             order.company     || '',       // 訂貨單位
@@ -53,10 +54,8 @@ router.post('/submit-order', async (req, res) => {
             order.paymentMethod|| '',      // 付款方式
             order.notes       || '',       // 備註
             // 使用 toLocaleString 產生台灣時區
-            new Date().toLocaleString('zh-TW', {hour12:false})
+            orderDate
         ]));
-
-        console.log(rows);
 
         // 4. 執行 append methd 將 rows 陣列新增至試算表的下一個可用列
         await sheets.spreadsheets.values.append({
@@ -70,15 +69,27 @@ router.post('/submit-order', async (req, res) => {
         console.log('訂單成功寫入 Google Sheets');
 
         // 5. 將訂單資訊寄送給客戶 email
-        
+        // use sendgrid send email
+        const subject = `您的訂單 ${orderId} 已送出`;
+        const dynamicTemplateData = {
+            company:order.company,
+            orderId:orderId,
+            orderDate:orderDate,
+            paymentMethod:order.paymentMethod,
+            items:order.items,
+            totalAmount:order.totalAmount,
+            notes:order.notes
+        }
+        await sendOrderEmail(order.email,subject,dynamicTemplateData);
+
         //  完成後渲染thank-you page
         res.render('thank-you',{
             name:order.company,
             orderNumber:orderId
         });
     } catch (error) {
-        console.error('寫入 Google Sheets 發生錯誤', error);
-        res.status(500).send('訂單儲存失敗');
+        // console.error('寫入 Google Sheets 發生錯誤', error);
+        // res.status(500).send('訂單儲存失敗');
     }
     
 })
