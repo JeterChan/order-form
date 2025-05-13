@@ -56,17 +56,22 @@
               <table class="table table-bordered text-center align-middle" id="productTable">
                 <thead class="table-light">
                   <tr>
-                    <th>商品名稱</th>
+                    <th>編號</th>
+                    <th>品名</th>
+                    <th>規格</th>
                     <th>數量</th>
                     <th>單價</th>
                     <th>總價</th>
                     <th>操作</th>
                   </tr>
                 </thead>
+
                 <tbody id="productTbody">
                   <!-- 初始1列 -->
                   <tr>
+                    <td><input type="text" class="form-control" name="items[0][number]" required></td>
                     <td><input type="text" class="form-control" name="items[0][name]" required></td>
+                    <td><input type="text" class="form-control" name="items[0][spec]"></td>
                     <td><input type="number" class="form-control quantity" name="items[0][quantity]" required></td>
                     <td><input type="number" class="form-control price" name="items[0][price]" required></td>
                     <td><input type="number" class="form-control total" name="items[0][total]" readonly></td>
@@ -131,8 +136,10 @@
       const tbody = document.getElementById('productTbody');
       const row = document.createElement('tr');
 
-      row.innerHTML = `
+     row.innerHTML = `
+        <td><input type="text" class="form-control" name="items[${rowIndex}][number]" required></td>
         <td><input type="text" class="form-control" name="items[${rowIndex}][name]" required></td>
+        <td><input type="text" class="form-control" name="items[${rowIndex}][spec]"></td>
         <td><input type="number" class="form-control quantity" name="items[${rowIndex}][quantity]" required></td>
         <td><input type="number" class="form-control price" name="items[${rowIndex}][price]" required></td>
         <td><input type="number" class="form-control total" name="items[${rowIndex}][total]" readonly></td>
