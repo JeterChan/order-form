@@ -22,10 +22,11 @@ router.get('/', async(req, res) => {
 
 // post: 表單送出後儲存至 google sheets
 router.post('/submit-order', async (req, res) => {
+    console.log(req.body);
+
     const order = req.body; // 直接將 req.body 儲存在 order 變數內
     const spreadsheetId = process.env.SPREADSHEET_ID;
     const sheetName = '訂單總表';
-    
     // 產生 order id
     const orderId = generateOrderId();
 
@@ -46,6 +47,7 @@ router.post('/submit-order', async (req, res) => {
             order.address     || '',       // 地址
             order.invoiceTitle|| '',       // 發票抬頭
             order.taxId       || '',       // 統一編號
+            order.number      || '',       // 商品編號
             item.name         || '',       // 單一商品名稱
             item.quantity     || '',       // 該商品數量
             item.price        || '',       // 該商品單價
@@ -83,15 +85,23 @@ router.post('/submit-order', async (req, res) => {
         await sendOrderEmail(order.email,subject,dynamicTemplateData);
 
         //  完成後渲染thank-you page
-        res.render('thank-you',{
-            name:order.company,
-            orderNumber:orderId
-        });
+        res.redirect(`/thank-you?orderNumber=${orderId}&name=${encodeURIComponent(order.company)}`)
     } catch (error) {
-        // console.error('寫入 Google Sheets 發生錯誤', error);
-        // res.status(500).send('訂單儲存失敗');
+        console.error('處理表單發生錯誤', error);
+        res.status(500).json({
+            success:false,
+            message:'Server error, please try it later'
+        });
     }
-    
+});
+
+router.get('/thank-you', async(req, res) => {
+    const {orderNumber, name} = req.query;
+    res.render('thank-you', {
+        orderNumber,
+        name
+    })
 })
+
 
 module.exports = router;
