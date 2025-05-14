@@ -7,10 +7,17 @@ const { sendOrderEmail } = require('../utils/mailer');
 require('dotenv').config();
 
 // 建立 Google Sheets API 認證物件
+const raw = process.env.GOOGLE_SERVICE_ACCOUNT;
+const parsed = JSON.parse(raw);
+
+// Fix private_key newlines
+parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+
 const auth = new google.auth.GoogleAuth({
-    keyFilename:path.join(__dirname,'../config/cy-order-form-be56c183fd58.json'),
-    scopes:['https://www.googleapis.com/auth/spreadsheets']
+  credentials: parsed,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets']
 });
+
 
 // 只允許大寫英文字母和數字
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
