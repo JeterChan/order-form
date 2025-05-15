@@ -24,7 +24,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">電話<span class="text-danger">*</span></label>
-                <input type="tel" name="phone" class="form-control" required pattern="^09\d{8}$">
+                <input type="tel" name="phone" class="form-control" pattern="^09[1-9]\d{7}$" required >
                 <div class="invalid-feedback">請輸入有效的手機號碼（例如 09XXXXXXXX）</div>
               </div>
               <div class="col-md-6">
@@ -33,7 +33,7 @@
                 <div class="invalid-feedback">請輸入地址</div>
               </div>       
               <div class="col-md-6">
-                <label class="form-label">Email</label>
+                <label class="form-label">Email<span class="text-danger">*</span></label>
                 <input type="email" name="email" class="form-control" required>
                 <div class="invalid-feedback">請輸入正確的 Email</div>
               </div>
@@ -72,8 +72,8 @@
                     <td><input type="text" class="form-control" name="items[0][number]" required></td>
                     <td><input type="text" class="form-control" name="items[0][name]" required></td>
                     <td><input type="text" class="form-control" name="items[0][spec]"></td>
-                    <td><input type="number" class="form-control quantity" name="items[0][quantity]" required></td>
-                    <td><input type="number" class="form-control price" name="items[0][price]" required></td>
+                    <td><input type="number" class="form-control quantity" name="items[0][quantity]" oninput="value=value.replace('-','')" required></td>
+                    <td><input type="number" class="form-control price" name="items[0][price]" oninput="value=value.replace('-','')" required></td>
                     <td><input type="number" class="form-control total" name="items[0][total]" readonly></td>
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">刪除</button></td>
                   </tr>

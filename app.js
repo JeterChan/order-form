@@ -2,7 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const orderRouter = require('./routes/order');
-require('dotenv').config();
+if( process.env.NODE_ENV === 'development'){
+  require('dotenv').config();
+}
+
 const app = express();
 
 // 處理 JSON 請求主體
