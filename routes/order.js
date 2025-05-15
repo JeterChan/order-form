@@ -4,7 +4,9 @@ const path = require('path');
 const { google } = require('googleapis');
 const { customAlphabet } = require('nanoid');
 const { sendOrderEmail } = require('../utils/mailer');
-require('dotenv').config();
+if( process.env.NODE_ENV === 'development'){
+  require('dotenv').config();
+}
 
 // 建立 Google Sheets API 認證物件
 const raw = process.env.GOOGLE_SERVICE_ACCOUNT;
