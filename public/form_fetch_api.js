@@ -90,48 +90,76 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // 添加新商品行
-  window.addRow = function() {
+  window.addRow = function () {
     const tbody = document.getElementById('productTbody');
     const rowCount = tbody.children.length;
-    
+
     const newRow = document.createElement('tr');
     newRow.innerHTML = `
-      <td><input type="text" class="form-control" name="items[${rowCount}][number]" required></td>
-      <td><input type="text" class="form-control" name="items[${rowCount}][name]" required></td>
-      <td><input type="text" class="form-control" name="items[${rowCount}][spec]"></td>
-      <td><input type="number" class="form-control quantity" name="items[${rowCount}][quantity]" required></td>
-      <td><input type="number" class="form-control price" name="items[${rowCount}][price]" required></td>
-      <td><input type="number" class="form-control total" name="items[${rowCount}][total]" readonly></td>
-      <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">刪除</button></td>
+      <td data-label="編號">
+        <input type="text" class="form-control" name="items[${rowCount}][number]" required>
+      </td>
+      <td data-label="品名">
+        <input type="text" class="form-control" name="items[${rowCount}][name]" required>
+      </td>
+      <td data-label="規格">
+        <input type="text" class="form-control" name="items[${rowCount}][spec]">
+      </td>
+      <td data-label="數量">
+        <input type="number" class="form-control quantity" name="items[${rowCount}][quantity]" oninput="value=value.replace('-','')" required>
+      </td>
+      <td data-label="單價">
+        <input type="number" class="form-control price" name="items[${rowCount}][price]" oninput="value=value.replace('-','')" required>
+      </td>
+      <td data-label="總價">
+        <input type="number" class="form-control total" name="items[${rowCount}][total]" readonly>
+      </td>
+      <td data-label="操作">
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">刪除</button>
+      </td>
     `;
-    
+
     tbody.appendChild(newRow);
   };
+
+
   
-  // 删除商品行
   window.removeRow = function(button) {
-    if (document.getElementById('productTbody').children.length > 1) {
-      const row = button.closest('tr');
-      row.remove();
-      
-      // 重新排序剩餘行的索引
-      const rows = document.getElementById('productTbody').children;
-      for (let i = 0; i < rows.length; i++) {
-        const inputs = rows[i].querySelectorAll('input');
-        inputs.forEach(input => {
-          if (input.name && input.name.includes('[')) {
-            input.name = input.name.replace(/\[\d+\]/, `[${i}]`);
-          }
-        });
-      }
-      
-      // 重新計算總金額
-      calculateItemTotal();
-    } else {
+    const tableBody = document.getElementById('productTbody');
+    const rows = Array.from(tableBody.children);
+
+    if (rows.length <= 1) {
       alert('至少需要一項商品！');
+      return;
     }
+
+    // 刪除該列
+    const targetRow = button.closest('tr');
+    targetRow.remove();
+
+    // 重新編號剩下每一列的 input name 和 data-label（保持正確索引）
+    const updatedRows = Array.from(tableBody.children);
+    updatedRows.forEach((row, index) => {
+      const cells = row.children;
+
+      if (cells.length === 7) {
+        // 分別對每個 <td> 進行更新
+        const [numberTd, nameTd, specTd, quantityTd, priceTd, totalTd, btnTd] = cells;
+
+        // 更新 data-label 不變，但 name 屬性需重編索引
+        numberTd.querySelector('input').name = `items[${index}][number]`;
+        nameTd.querySelector('input').name = `items[${index}][name]`;
+        specTd.querySelector('input').name = `items[${index}][spec]`;
+        quantityTd.querySelector('input').name = `items[${index}][quantity]`;
+        priceTd.querySelector('input').name = `items[${index}][price]`;
+        totalTd.querySelector('input').name = `items[${index}][total]`;
+      }
+    });
+
+    // 重新計算總金額
+    calculateItemTotal();
   };
-  
+
   // 初始化計算總金額
   calculateItemTotal();
 });
