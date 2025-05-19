@@ -4,7 +4,6 @@ const path = require('path');
 const { google } = require('googleapis');
 const { customAlphabet } = require('nanoid');
 const { sendOrderEmail } = require('../utils/mailer');
-const { domainToASCII } = require('url');
 if( process.env.NODE_ENV === 'development'){
   require('dotenv').config();
 }
@@ -83,7 +82,7 @@ router.post('/submit-order', async (req, res) => {
         console.error('處理表單發生錯誤', error);
         res.status(500).json({
             success:false,
-            message:'Server error, please try it later'
+            message:error.message
         });
     }
 });
