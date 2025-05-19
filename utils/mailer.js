@@ -1,7 +1,10 @@
 const sendgrid = require('@sendgrid/mail');
 const ejs = require('ejs');
 const path = require('path');
-require('dotenv').config();
+if(NODE_ENV = 'development'){
+    require('dotenv').config();
+}
+
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
