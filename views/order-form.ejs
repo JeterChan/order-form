@@ -118,10 +118,18 @@
               <label class="form-label">備註</label>
               <textarea class="form-control" name="notes" rows="3"></textarea>
             </div>
-
+            
             <div class="text-end">
-              <button type="submit" class="btn btn-primary">送出訂單</button>
-            </div>
+              <!-- reCAPTCHA 按鈕靠右 -->
+              <div class="d-inline-block">
+                <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>"></div>
+              </div>
+
+              <!-- 間距 -->
+              <div class="mt-2">
+                <button type="submit" class="btn btn-primary btn-lg">送出訂單</button>
+              </div>
+            </div>            
           </form>
           <%- include('partials/footer') %>
       </div>
@@ -153,5 +161,9 @@
 
   <!-- ✅ 客製功能 JS -->
   <script src="form_fetch_api.js"></script>
+
+  <!-- google recaptcha js -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 </body>
 </html>

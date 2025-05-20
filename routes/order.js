@@ -4,6 +4,7 @@ const path = require('path');
 const { google } = require('googleapis');
 const { customAlphabet } = require('nanoid');
 const { sendOrderEmail } = require('../utils/mailer');
+const axios = require('axios');
 if( process.env.NODE_ENV === 'development'){
   require('dotenv').config();
 }
@@ -36,6 +37,37 @@ router.get('/', async(req, res) => {
 // post: 表單送出後儲存至 google sheets
 router.post('/submit-order', async (req, res) => {
     const order = req.body; // 直接將 req.body 儲存在 order 變數內
+    const recaptchaResponse = req.body['g-recaptcha-response'];
+    
+    if (!recaptchaResponse) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Please complete the reCAPTCHA challenge' 
+      });
+    }
+
+    // 先驗證 reCAPTCHA
+    const verificationResponse = await axios.post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        null,
+        {
+            params:{
+                secret:process.env.RECAPTCHA_SECRET_KEY,
+                response:recaptchaResponse,
+                remoteip:req.ip
+            },
+        }
+    );
+
+    // Check verification result
+    const { success, score } = verificationResponse.data;
+
+    if (!success) {
+      return res.status(400).json({
+        success: false,
+        message: 'reCAPTCHA verification failed'
+      });
+    }
 
     // 產生 order id
     const orderId = generateOrderId();

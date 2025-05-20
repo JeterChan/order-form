@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // 處理表單提交
   form.addEventListener('submit', function(event) {
     event.preventDefault();
+
+    const recaptchaResponse  = grecaptcha.getResponse();
+    if (!recaptchaResponse ) {
+      alert("請先通過驗證");
+      return;
+    }
     
     // 🔽 至少填寫一項電話欄位的驗證
     const phone = document.getElementById('phone');
@@ -53,7 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (jsonData.items) {
       jsonData.items = Object.values(jsonData.items);
     }
-    
+
+    jsonData['g-recaptcha-response'] = recaptchaResponse ;
+
     // 發送請求
     fetch('/submit-order', {
       method: 'POST',
@@ -63,6 +71,8 @@ document.addEventListener('DOMContentLoaded', function() {
       body: JSON.stringify(jsonData)
     })
     .then(response => {
+      // ✅ 每次送出後重置 reCAPTCHA
+      grecaptcha.reset();
       if (response.redirected) {
           window.location.href = response.url;      
       } else {
@@ -72,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     .catch(error => {
       // 處理錯誤
+      grecaptcha.reset(); // 即使失敗也要 reset 以便重新勾選
       alert('提交失敗：' + error.message);
       console.error('提交錯誤：', error);
     });
