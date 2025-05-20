@@ -6,6 +6,22 @@ document.addEventListener('DOMContentLoaded', function() {
   form.addEventListener('submit', function(event) {
     event.preventDefault();
     
+    // 🔽 至少填寫一項電話欄位的驗證
+    const phone = document.getElementById('phone');
+    const indoorPhone = document.getElementById('indoorPhone');
+    const phoneValue = phone?.value.trim() || '';
+    const indoorPhoneValue = indoorPhone?.value.trim() || '';
+
+    if (!phoneValue && !indoorPhoneValue) {
+      phone.setCustomValidity("請至少填寫市話或手機號碼");
+      indoorPhone.setCustomValidity("請至少填寫市話或手機號碼");
+      const modal = new bootstrap.Modal(document.getElementById('phoneWarningModal'));
+      modal.show();
+    } else {
+      phone.setCustomValidity("");
+      indoorPhone.setCustomValidity("");
+    }
+
     // 表單驗證
     if (!form.checkValidity()) {
       event.stopPropagation();

@@ -66,6 +66,10 @@ router.post('/submit-order', async (req, res) => {
             totalAmount:order.totalAmount,
             notes:order.notes
         }
+
+        //  完成後渲染thank-you page
+        res.redirect(`/thank-you?orderNumber=${orderId}&name=${encodeURIComponent(order.company)}`)
+        
         // send email
         await sendOrderEmail(order.email,subject,dynamicTemplateData);
 
@@ -76,8 +80,7 @@ router.post('/submit-order', async (req, res) => {
         await insertBlanckRows(docs,order.items,docsId);
         await insertOrderItems(docs,order,docsId);
 
-        //  完成後渲染thank-you page
-        res.redirect(`/thank-you?orderNumber=${orderId}&name=${encodeURIComponent(order.company)}`)
+        
     } catch (error) {
         console.error('處理表單發生錯誤', error);
         res.status(500).json({
@@ -271,6 +274,17 @@ const insertOrderItems = async (docs,order,newDocsId) => {
                 matchCase:true
             },
             replaceText:order.totalAmount
+        }
+    })
+
+    // insert note
+    fillCellRequests.push({
+        replaceAllText:{
+            containsText:{
+                text:`{{notes}}`,
+                matchCase:true
+            },
+            replaceText:order.notes
         }
     })
     
