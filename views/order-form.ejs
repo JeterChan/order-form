@@ -29,16 +29,6 @@
                 <div class="invalid-feedback">請輸入聯絡人</div>
               </div>
               <div class="col-md-6">
-                <label class="form-label">市內電話</label>
-                <input type="tel" name="indoorPhone" class="form-control" pattern="^0[1-8]\d{7}$">
-                <div class="invalid-feedback">請輸入有效的市內電話（例如 04XXXXXXXX）</div>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">手機號碼</label>
-                <input type="tel" name="phone" class="form-control" pattern="^09[1-9]\d{7}$">
-                <div class="invalid-feedback">請輸入有效的手機號碼（例如 09XXXXXXXX）</div>
-              </div>
-              <div class="col-md-6">
                 <label class="form-label">地址<span class="text-danger">*</span></label>
                 <input type="text" name="address" class="form-control" required>
                 <div class="invalid-feedback">請輸入地址</div>
@@ -47,6 +37,15 @@
                 <label class="form-label">Email<span class="text-danger">*</span></label>
                 <input type="email" name="email" class="form-control" required>
                 <div class="invalid-feedback">請輸入正確的 Email</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">手機號碼</label>
+                <input type="tel" name="phone" id="phone" class="form-control" pattern="^09[1-9]\d{7}$">
+                <div class="invalid-feedback">請輸入有效的手機號碼（例如 09XXXXXXXX）</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">市內電話</label>
+                <input type="tel" name="indoorPhone" id="indoorPhone" class="form-control">
               </div>
               <div class="col-md-6">
                 <label class="form-label">抬頭</label>
@@ -124,19 +123,30 @@
               <button type="submit" class="btn btn-primary">送出訂單</button>
             </div>
           </form>
-
-          <!-- 📞 駿英企業社聯絡方式 -->
-          <div class="text-center text-muted small mt-5">
-            <hr>
-            <p>駿英企業社</p>
-            <p>TEL: 04-7624868、04-7639856</p>
-            <p>FAX: 04-7623685</p>
-            <p>地址：彰化市崙平南路139-3號</p>
-          </div>
+          <%- include('partials/footer') %>
+      </div>
+    </div>
+  </div>
+  <!-- 電話欄位未填提示彈窗 -->
+  <div class="modal fade" id="phoneWarningModal" tabindex="-1" aria-labelledby="phoneWarningModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="phoneWarningModalLabel">提醒您</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+        </div>
+        <div class="modal-body">
+          請至少填寫市話或手機號碼。
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">知道了</button>
         </div>
       </div>
     </div>
   </div>
+  <!-- End of model -->
+  
+  <!-- End of body -->
 
   <!-- ✅ Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

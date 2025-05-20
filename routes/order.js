@@ -273,6 +273,17 @@ const insertOrderItems = async (docs,order,newDocsId) => {
             replaceText:order.totalAmount
         }
     })
+
+    // insert note
+    fillCellRequests.push({
+        replaceAllText:{
+            containsText:{
+                text:`{{notes}}`,
+                matchCase:true
+            },
+            replaceText:order.notes
+        }
+    })
     
     // 7. 執行填字
     await docs.documents.batchUpdate({
