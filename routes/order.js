@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 const { google } = require('googleapis');
 const { customAlphabet } = require('nanoid');
-const { sendOrderEmail } = require('../utils/mailer');
+const { sendOrderEmail,notifyAdminByEmail } = require('../utils/mailer');
 const axios = require('axios');
 if( process.env.NODE_ENV === 'development'){
   require('dotenv').config();
@@ -102,8 +102,15 @@ router.post('/submit-order', async (req, res) => {
         //  完成後渲染thank-you page
         res.redirect(`/thank-you?orderNumber=${orderId}&name=${encodeURIComponent(order.company)}`)
         
-        // send email
+        // send email to customer
         await sendOrderEmail(order.email,subject,dynamicTemplateData);
+        // send email to admin
+        const infoSendAdmin = {
+            orderId:orderId,
+            userName:order.company,
+            userEmail:order.email
+        }
+        await notifyAdminByEmail(infoSendAdmin)
 
         // 5. create new docs which stores order infomation
         // generate docs in drive folder and return docs id
