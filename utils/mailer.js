@@ -28,7 +28,7 @@ const sendOrderEmail = async (to, subject, dynamicTemplateData) => {
 const notifyAdminByEmail = async(datas) => {
     try{
         await sendgrid.send({
-            to:'cy7624868@gmail.com',
+            to:process.env.ADMIN_EMAIL,
             from:process.env.FROM_EMAIL,
             templateId:'d-b40e2210fbe24b29b5bc4b02a9feb7a4',
             dynamicTemplateData:datas
