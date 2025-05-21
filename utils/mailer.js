@@ -5,7 +5,6 @@ if(NODE_ENV = 'development'){
     require('dotenv').config();
 }
 
-
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendOrderEmail = async (to, subject, dynamicTemplateData) => {
@@ -24,8 +23,23 @@ const sendOrderEmail = async (to, subject, dynamicTemplateData) => {
         throw error;
     }
     
-}   
+}
+
+const notifyAdminByEmail = async(datas) => {
+    try{
+        await sendgrid.send({
+            to:'cy7624868@gmail.com',
+            from:process.env.FROM_EMAIL,
+            templateId:'d-b40e2210fbe24b29b5bc4b02a9feb7a4',
+            dynamicTemplateData:datas
+        });
+    }catch(error){
+        console.log('Failed to send mail to admin', error.response);
+        throw error;
+    }
+}
 
 module.exports = {
-    sendOrderEmail
+    sendOrderEmail,
+    notifyAdminByEmail
 };
