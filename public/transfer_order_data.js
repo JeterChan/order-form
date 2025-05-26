@@ -4,11 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 處理表單提交
   form.addEventListener('submit', function(event) {
-    event.preventDefault();
 
     const recaptchaResponse  = grecaptcha.getResponse();
     if (!recaptchaResponse ) {
+      event.preventDefault();
       alert("請先通過驗證");
+      grecaptcha.reset();
       return;
     }
     
@@ -19,10 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const indoorPhoneValue = indoorPhone?.value.trim() || '';
 
     if (!phoneValue && !indoorPhoneValue) {
+      event.preventDefault();
       phone.setCustomValidity("請至少填寫市話或手機號碼");
       indoorPhone.setCustomValidity("請至少填寫市話或手機號碼");
+      
+      grecaptcha.reset();
       const modal = new bootstrap.Modal(document.getElementById('phoneWarningModal'));
       modal.show();
+      return;
     } else {
       phone.setCustomValidity("");
       indoorPhone.setCustomValidity("");
@@ -30,62 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 表單驗證
     if (!form.checkValidity()) {
+      event.preventDefault();
       event.stopPropagation();
       form.classList.add('was-validated');
+
+      grecaptcha.reset();
       return;
     }
-    
-    // 如果驗證通過，收集表單數據
-    const formData = new FormData(form);
-    
-    // 將 FormData 轉換為 JSON 對象
-    const jsonData = {};
-    formData.forEach((value, key) => {
-      // 處理陣列輸入 (items[0][name] 等)
-      if (key.includes('[')) {
-        const matches = key.match(/([a-z]+)\[(\d+)\]\[([a-z]+)\]/i);
-        if (matches) {
-          const [, arrayName, index, property] = matches;
-          if (!jsonData[arrayName]) jsonData[arrayName] = [];
-          if (!jsonData[arrayName][index]) jsonData[arrayName][index] = {};
-          jsonData[arrayName][index][property] = value;
-        }
-      } else {
-        jsonData[key] = value;
-      }
-    });
-    
-    // 確保商品項目是陣列
-    if (jsonData.items) {
-      jsonData.items = Object.values(jsonData.items);
-    }
 
-    jsonData['g-recaptcha-response'] = recaptchaResponse ;
-
-    // 發送請求
-    fetch('/submit-order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(jsonData)
-    })
-    .then(response => {
-      // ✅ 每次送出後重置 reCAPTCHA
-      grecaptcha.reset();
-      if (response.redirected) {
-          window.location.href = response.url;      
-      } else {
-        throw new Error('未收到轉址');
-      }
-    })
-    
-    .catch(error => {
-      // 處理錯誤
-      grecaptcha.reset(); // 即使失敗也要 reset 以便重新勾選
-      alert('提交失敗：' + error.message);
-      console.error('提交錯誤：', error);
-    });
+    // 填入 reCAPTCHA token 至隱藏欄位
+    document.getElementById('gRecaptchaResponse').value = recaptchaResponse;
   });
   
   // 計算單項商品總價
