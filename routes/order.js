@@ -93,7 +93,7 @@ router.post('/submit-order',verifyOrigin, verifyRecaptcha, async (req, res) => {
         
     } catch (error) {
         console.error('處理表單發生錯誤', error);
-        res.status(500).json({
+        return res.status(500).json({
             success:false,
             message:error.message
         });
@@ -239,13 +239,13 @@ const insertOrderItems = async (docs,order,newDocsId) => {
         const row = tableStartAfterBlank.tableRows[i+1];
         // 一列有7欄, define 要傳入的 data
         const datas = [
-            (i+1).toString(),
-            item.number,
-            item.name,
-            item.spec,
-            item.quantity.toString(),
-            item.price.toString(),
-            item.total.toString()
+            (i+1).toString() || '0',
+            item.number || '',
+            item.name || '',
+            item.spec || '無',
+            item.quantity.toString() || '0',
+            item.price.toString() || '0',
+            item.total.toString() || '0'
         ]
 
         datas.forEach((text, colIndex) => {
